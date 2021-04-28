@@ -6,8 +6,13 @@ const { app, BrowserWindow, ipcMain, Notification, shell, dialog } = require('el
 const isDev = require('electron-is-dev')
 const { autoUpdater } = require('electron-updater')
 
+const electronLog = require('electron-log')
+const mainLog = electronLog.create('main-log')
+const updaterLog = electronLog.create('updater-log')
+
 const { channels } = require('../src/shared/constants')
 const { createPDF } = require('./services/createPDF')
+const { createJSON } = require('./services/createJSON')
 
 let mainWindow
 if (isDev) {
@@ -49,13 +54,34 @@ function createWindow () {
 }
 
 function onAppInit () {
-  const appPath = path.join(app.getPath('documents'), 'fotaka')
-  if (!fs.existsSync(appPath)) { fs.mkdirSync(appPath) }
+  const configPath = path.join(app.getPath('documents'), 'fotaka')
+  if (!fs.existsSync(configPath)) { fs.mkdirSync(configPath) }
 
-  storage.setDataPath(appPath)
-  storage.set('config', {
-    appPath: appPath,
-    contractsPath: path.join(appPath, 'contratos')
+  const logsPath = path.join(configPath, 'logs')
+  if (!fs.existsSync(logsPath)) { fs.mkdirSync(logsPath) }
+
+  mainLog.transports.file.resolvePath = () => path.join(logsPath, 'main.log')
+  updaterLog.transports.file.resolvePath = () => path.join(logsPath, 'updates.log')
+
+  autoUpdater.logger = updaterLog
+
+  storage.setDataPath(configPath)
+  storage.has('config', (err, hasKey) => {
+    if (err) console.error(err)
+    if (!hasKey) {
+      storage.set('config', {
+        configPath,
+        contractsPath: path.join(configPath, 'contratos'),
+        logsPath
+      })
+    }
+
+    storage.get('config', (err, data) => {
+      if (err)console.log(err)
+
+      if (!data.configPath) data.configPath = configPath
+      storage.set('config', data)
+    })
   })
 }
 onAppInit()
@@ -82,22 +108,26 @@ ipcMain.handle(channels.CREATE_CONTRACT_PDF, async (evt, data) => {
       message: '¿Quieres crear el contrato?'
     })
     .then(({ response }) => {
-      console.log(response)
       if (response === 0) {
-        const appPath = path.join(app.getPath('documents'), 'fotaka')
-        if (!fs.existsSync(appPath)) { fs.mkdirSync(appPath) }
-        const contractsPath = path.join(app.getPath('documents'), 'fotaka', 'contratos')
-        if (!fs.existsSync(contractsPath)) { fs.mkdirSync(contractsPath) }
+        const config = storage.getSync('config')
+        const appPath = config.configPath
+        const contractsPath = config.contractsPath
+        const jsonDatabasePath = path.join(appPath, 'database')
 
-        createPDF(path.join(app.getPath('documents'), 'fotaka', 'contratos'), data)
+        if (!fs.existsSync(appPath)) { fs.mkdirSync(appPath, { recursive: true }) }
+        if (!fs.existsSync(contractsPath)) { fs.mkdirSync(contractsPath, { recursive: true }) }
+        if (!fs.existsSync(jsonDatabasePath)) { fs.mkdirSync(jsonDatabasePath, { recursive: true }) }
+
+        createPDF(contractsPath, data)
+        createJSON(jsonDatabasePath, data)
 
         const notification = new Notification({
           title: 'Contrato creado',
-          body: 'El contrato ha sido creado y guardado en documentos'
+          body: `El contrato ha sido creado y guardado en ${config.contractsPath}`
         })
 
         notification.on('click', () => {
-          shell.openPath(path.join(app.getPath('documents'), 'fotaka', 'contratos'))
+          shell.openPath(contractsPath)
         })
 
         notification.show()
@@ -135,14 +165,28 @@ ipcMain.handle(channels.SELECT_DIRECTORY, (evt, data) => {
   }
 })
 
+ipcMain.handle(channels.UPDATE_CONFIG, (evt, { contractsPath }) => {
+  storage.get('config', (err, data) => {
+    if (err) console.error(err)
+    data.contractsPath = contractsPath
+    storage.set('config', data)
+  })
+})
+
 ipcMain.handle(channels.RESTART_APP, () => {
   autoUpdater.quitAndInstall()
 })
 
+autoUpdater.on('error', (err) => {
+  updaterLog.error(err)
+})
+
 autoUpdater.on('update-available', () => {
-  mainWindow.webContents.send('update-available')
+  updaterLog.info('New update available')
+  mainWindow.webContents.send('update_available')
 })
 
 autoUpdater.on('update-downloaded', () => {
-  mainWindow.webContents.send('update-downloaded')
+  updaterLog.info('Update Downloaded.')
+  mainWindow.webContents.send('update_downloaded')
 })

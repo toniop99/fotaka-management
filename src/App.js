@@ -23,15 +23,15 @@ const { Header, Sider, Content } = Layout
 function App () {
   const [collapse, setCollapsed] = useState(false)
 
-  ipcRenderer.on('update-available', () => {
-    ipcRenderer.removeAllListeners('update-available')
+  ipcRenderer.on('update_available', () => {
+    ipcRenderer.removeAllListeners('update_available')
     notification.open({
       message: 'Actualización disponible',
       description: 'La actualización se descargará en segundo plano'
     })
   })
 
-  ipcRenderer.on('update-downloaded', () => {
+  ipcRenderer.on('update_downloaded', () => {
     const restartBtn = (
       <Button
         type='primary'
@@ -40,7 +40,7 @@ function App () {
       >Reiniciar
       </Button>
     )
-    ipcRenderer.removeAllListeners('update-downloaded')
+    ipcRenderer.removeAllListeners('update_downloaded')
     notification.open({
       message: 'Actualización descargada',
       description: 'La actualización se instalará al reiniciar el programa. ¿Reiniciar ahora?',

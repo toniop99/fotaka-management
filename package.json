@@ -1,7 +1,7 @@
 {
   "name": "fotaka-management",
   "main": "electron/electron.js",
-  "version": "0.1.1",
+  "version": "0.1.5",
   "private": true,
   "homepage": "./",
   "author": {
@@ -21,7 +21,7 @@
     "build:react": "craco build",
     "build:electron": "npx mkdirp ./build/src & robocopy electron build/electron /e & robocopy src/shared build/src/shared /e & exit 0",
     "package:dev": "electron-builder build --win --publish never",
-    "package:deploy": "electron-builder build --win --publish always"
+    "package:release": "electron-builder build --win --publish always"
   },
   "eslintConfig": {
     "extends": [
@@ -37,6 +37,7 @@
     "antd": "^4.15.2",
     "electron-is-dev": "^2.0.0",
     "electron-json-storage": "^4.5.0",
+    "electron-log": "^4.3.4",
     "electron-updater": "^4.3.8",
     "moment": "^2.29.1",
     "pdfkit": "^0.12.1",

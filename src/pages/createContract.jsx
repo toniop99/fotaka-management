@@ -119,8 +119,8 @@ export default function CreateContract () {
         <TextArea name='notes-text-area' allowClear autoSize={{ minRows: 5, maxRows: 12 }} placeholder='Escribe aquí la información extra que necesites' />
       </Form.Item>
 
-      <Form.Item {...tailLayout}>
-        <Button type='primary' htmlType='submit'>
+      <Form.Item>
+        <Button type='primary' block htmlType='submit'>
           Crear Contrato
         </Button>
       </Form.Item>
