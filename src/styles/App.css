@@ -1,0 +1,13 @@
+@import url('~antd/dist/antd.css');
+
+.content-layout .content-layout-top {
+  background: #fff;  
+  padding:0 0 0 10px;
+}
+
+.content {
+  background: #fff;
+  margin: 24px 16px;
+  padding: 24;
+  min-height: 200;
+}
