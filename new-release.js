@@ -9,16 +9,16 @@ while (argv.mode !== 'release' && argv.mode !== 'dev') {
   argv.mode = prompt('Dime si es una release o dev: ')
 }
 
-if (argv.mode === 'release') {
-  while (!argv.version) {
-    argv.version = prompt('Dime la nueva versión de la release: ')
-  }
+// if (argv.mode === 'release') {
+//   while (!argv.version) {
+//     argv.version = prompt('Dime la nueva versión de la release: ')
+//   }
 
-  packageJSON.version = argv.version
-  console.log('writing to ' + packageJsonPath)
-  fs.writeFileSync(packageJsonPath, JSON.stringify(packageJSON, null, 2))
-  console.log('package.json updates')
-}
+//   packageJSON.version = argv.version
+//   console.log('writing to ' + packageJsonPath)
+//   fs.writeFileSync(packageJsonPath, JSON.stringify(packageJSON, null, 2))
+//   console.log('package.json updates')
+// }
 
 console.log('Creando la aplicación react.')
 execSync('npm run build:react')

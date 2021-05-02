@@ -1,48 +1,36 @@
-import { ipcRenderer } from 'electron'
-import { useEffect, useState } from 'react'
-import { Row, Col, Button, Input } from 'antd'
-import { channels } from '../shared/constants'
+import { useState } from 'react'
+import { Menu } from 'antd'
+import GeneralSettings from './settings/general'
+import PackagesSettings from './settings/managePackages'
+import CreatePackageSettings from './settings/createPackage'
+
+const { SubMenu } = Menu
 
 export default function Settings () {
-  const [contractsPath, setContractsPath] = useState(null)
-
-  useEffect(() => {
-    ipcRenderer.invoke(channels.GET_CONFIG).then(({ appPath, contractsPath }) => {
-      contractsPath ? setContractsPath(contractsPath) : setContractsPath('')
-    })
-  }, [])
-
-  function manageContractsFolder () {
-    ipcRenderer.invoke(channels.SELECT_DIRECTORY).then(({ path }) => {
-      if (path) setContractsPath(path)
-    })
-  }
-
-  function saveConfig () {
-    ipcRenderer.invoke(channels.UPDATE_CONFIG,
-      {
-        contractsPath
-      }).then((result) => {
-
-    })
+  const [selectedMenu, setSelectedMenu] = useState('1')
+  function handleClick (e) {
+    setSelectedMenu(e.key)
   }
 
   return (
     <>
-      <Row style={{ marginTop: 20 }}>
-        <Col span={12}>
-          <Button onClick={manageContractsFolder} type='primary'>Cambiar carpeta de los contratos</Button>
-        </Col>
-        <Col span={12}>
-          <Input type='text' id={contractsPath} value={contractsPath} disabled />
-        </Col>
-      </Row>
+      <Menu
+        onClick={handleClick}
+        defaultSelectedKeys={['1']}
+        mode='horizontal'
+      >
 
-      <Row justify='center' style={{ marginTop: 20 }}>
-        <Col>
-          <Button onClick={saveConfig} type='primary'>Guardar Configuración</Button>
-        </Col>
-      </Row>
+        <Menu.Item key='1'>General</Menu.Item>
+        <SubMenu title='Paquetes'>
+          <Menu.Item key='2'>Gestionar Paquetes</Menu.Item>
+          <Menu.Item key='3'>Crear Paquete</Menu.Item>
+        </SubMenu>
+      </Menu>
+
+      {selectedMenu === '1' ? <GeneralSettings /> : null}
+      {selectedMenu === '2' ? <PackagesSettings /> : null}
+      {selectedMenu === '3' ? <CreatePackageSettings /> : null}
     </>
+
   )
 }

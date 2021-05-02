@@ -3,18 +3,30 @@ import locale from 'antd/es/date-picker/locale/es_ES'
 import { ipcRenderer } from 'electron'
 import { channels } from '../shared/constants'
 import moment from 'moment'
+import { useEffect, useState } from 'react'
 
-const { Option } = Select
 const { TextArea } = Input
 
 export default function CreateContract () {
+  const [packages, setPackages] = useState([])
+
+  useEffect(() => {
+    ipcRenderer.invoke(channels.GET_PACKAGES).then(({ packages }) => {
+      setPackages(packages)
+    })
+  }, [])
+
+  function selectOptions () {
+    const options = []
+    packages.forEach(p => {
+      options.push({ label: p.title, value: p.title })
+    })
+
+    return options
+  }
   const layout = {
     labelCol: { span: 4 },
     wrapperCol: { span: 16 }
-  }
-
-  const tailLayout = {
-    wrapperCol: { offset: 8, span: 16 }
   }
 
   const manageForm = (formData) => {
@@ -36,28 +48,13 @@ export default function CreateContract () {
   const [form] = Form.useForm()
 
   const manageSelectedPackage = (selectedPack) => {
-    switch (selectedPack) {
-      case 'pack-375':
+    packages.forEach(p => {
+      if (selectedPack === p.title) {
         form.setFieldsValue({
-          notes: 'pack-375:\nAlbum 30x35 - 10 Laminas - 40 fotos\nAlbum de Firmas 10 hojas\nVideo personalizado\n'
+          notes: `${p.title}:\n${p.content}\nPrecio: ${p.prize}`
         })
-        break
-      case 'pack-200':
-        form.setFieldsValue({
-          notes: 'pack-200:\nAlbum 30x35 - 8 Laminas - 35 fotos\nAlbum de Firmas blabla\n'
-        })
-        break
-      case 'pack-90':
-        form.setFieldsValue({
-          notes: 'pack-90: Album 20x25 - 10 fotos pegadas\n'
-        })
-        break
-      case 'custom-pack':
-
-        break
-      default:
-        console.log('err')
-    }
+      }
+    })
   }
 
   function disabledDate (current) {
@@ -106,13 +103,10 @@ export default function CreateContract () {
         <Select
           placeholder='Selecciona el paquete contratado'
           allowClear
+          options={selectOptions()}
           onChange={manageSelectedPackage}
-        >
-          <Option value='pack-375'>Paquete 375</Option>
-          <Option value='pack-200'>Paquete 200</Option>
-          <Option value='pack-90'>Paquete 90</Option>
-          <Option value='custom-pack'>Paquete Personalizazdo</Option>
-        </Select>
+        />
+
       </Form.Item>
 
       <Form.Item name='notes' label='Paquete Contratado y extras' labelCol>
