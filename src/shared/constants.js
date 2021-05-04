@@ -6,6 +6,10 @@ module.exports = {
     SELECT_DIRECTORY: 'select-directory',
     UPDATE_CONFIG: 'update-config',
     CREATE_CONTRACT_PDF: 'create-contract-pdf',
+    GET_CONTRACTS: 'get-contracts-database',
+    CREATE_CONTRACT: 'create-contract-database',
+    DELETE_CONTRACT: 'delete-contract-database',
+    EDIT_CONTRACT: 'edit-contract-database',
     GET_PACKAGES: 'get-packages',
     CREATE_PACKAGE: 'create-package',
     DELETE_PACKAGE: 'delete-package'

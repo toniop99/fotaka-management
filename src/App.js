@@ -13,6 +13,7 @@ import { useState } from 'react'
 import Calendar from './components/Calendar'
 import CreateContract from './pages/createContract'
 import Settings from './pages/settings'
+import ContractList from './pages/contractList'
 
 import { HashRouter, Link, Redirect, Route, Switch } from 'react-router-dom'
 import { ipcRenderer } from 'electron'
@@ -27,7 +28,8 @@ function App () {
     ipcRenderer.removeAllListeners('update_available')
     notification.open({
       message: 'Actualización disponible',
-      description: 'La actualización se descargará en segundo plano'
+      description: 'La actualización se descargará en segundo plano',
+      duration: 0
     })
   })
 
@@ -59,7 +61,7 @@ function App () {
               </Menu.Item>
 
               <Menu.Item key='2' icon={<OrderedListOutlined />}>
-                <Link to='/contract-list' replace>Mis Contratos</Link>
+                <Link to='/contracts-list' replace>Mis Contratos</Link>
               </Menu.Item>
 
               <Menu.Item key='3' icon={<CalendarOutlined />}>
@@ -104,6 +106,7 @@ function App () {
                 <Redirect to='create-contract' />
               </Route>
               <Route exact path='/create-contract' component={CreateContract} />
+              <Route exact path='/contracts-list' component={ContractList} />
               <Route exact path='/calendar' component={Calendar} />
               <Route exact path='/settings' component={Settings} />
             </Switch>

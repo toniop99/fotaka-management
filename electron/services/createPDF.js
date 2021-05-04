@@ -33,30 +33,51 @@ function createPDF (pdfPath, data) {
     .text(' ')
     .text(' ')
 
-  doc
-    .font('Helvetica-Bold')
-    .text('', 50)
-    .fontSize(12)
-    .text('Fecha del evento: ', { lineBreak: false })
-    .font('Helvetica')
-    .text(data.event.date)
-    .text(' ')
+  if (data.event) {
+    doc
+      .font('Helvetica-Bold')
+      .text('', 50)
+      .fontSize(12)
+      .text('Fecha del evento: ', { lineBreak: false })
+      .font('Helvetica')
+      .text(data.event.date)
+      .text(' ')
+
+    doc
+      .font('Helvetica-Bold')
+      .text('', 50)
+      .text('Lugar: ', { lineBreak: false })
+      .font('Helvetica')
+      .text(data.event.place)
+      .text(' ')
+
+    doc
+      .font('Helvetica-Bold')
+      .text('', 50)
+      .text('Dirección: ', { lineBreak: false })
+      .font('Helvetica')
+      .text(data.event.direction)
+      .text(' ')
+  }
+
+  if (data.studio) {
+    doc
+      .font('Helvetica-Bold')
+      .text('', 50)
+      .fontSize(12)
+      .text('Fecha del estudio: ', { lineBreak: false })
+      .font('Helvetica')
+      .text(data.studio.date)
+      .text(' ')
+  }
 
   doc
-    .font('Helvetica-Bold')
-    .text('', 50)
-    .text('Iglesia: ', { lineBreak: false })
-    .font('Helvetica')
-    .text(data.event.place)
-    .text(' ')
-
-  doc
-    .fontSize(10)
+    .fontSize(11)
     .font('Helvetica-Bold')
     .text('', 50)
     .text('Cliente: ', { lineBreak: false })
     .font('Helvetica')
-    .text(data.client.name)
+    .text(data.general.client.name)
     .text(' ')
 
   doc
@@ -64,7 +85,7 @@ function createPDF (pdfPath, data) {
     .text('', 50)
     .text('DNI: ', { lineBreak: false })
     .font('Helvetica')
-    .text(data.client.dni)
+    .text(data.general.client.dni)
     .text(' ')
 
   doc
@@ -72,15 +93,7 @@ function createPDF (pdfPath, data) {
     .text('', 50)
     .text('Teléfono: ', { lineBreak: false })
     .font('Helvetica')
-    .text(data.client.phone)
-    .text(' ')
-
-  doc
-    .font('Helvetica-Bold')
-    .text('', 50)
-    .text('Dirección: ', { lineBreak: false })
-    .font('Helvetica')
-    .text(data.client.direction)
+    .text(data.general.client.phone)
     .text(' ')
 
   doc
@@ -88,7 +101,7 @@ function createPDF (pdfPath, data) {
     .text('', 50)
     .text('Nombre del niño/a: ', { lineBreak: false })
     .font('Helvetica')
-    .text(data.model.name)
+    .text(data.general.model.name)
     .text(' ')
 
   doc
@@ -96,7 +109,7 @@ function createPDF (pdfPath, data) {
     .text('', 50)
     .text('Pack Seleccionado: ', { lineBreak: false })
     .font('Helvetica')
-    .text(data.pack)
+    .text(data.general.pack)
     .text(' ')
 
   doc.rect(50, doc.y + 25, 450, 150).stroke()
@@ -109,22 +122,22 @@ function createPDF (pdfPath, data) {
 
   const rectHeight = doc.y + 200
 
-  doc.rect(50, rectHeight, 450, 100).stroke()
+  // doc.rect(50, rectHeight, 450, 100).stroke()
   doc
     .fontSize(10)
-    .text('', 50)
-    .text(data.notes, 70, doc.y + 50)
+    // .text('', 50)
+    .text(data.general.notes, 65, doc.y + 20)
 
-  doc
-    .fontSize(15)
-    .font('Helvetica-Bold')
-    .text('Observaciones ', 50, rectHeight - 20, { align: 'center' })
-    .font('Helvetica')
+  // doc
+  //   .fontSize(15)
+  //   .font('Helvetica-Bold')
+  //   .text('Observaciones ', 50, rectHeight - 20, { align: 'center' })
+  //   .font('Helvetica')
 
-  doc
-    .fontSize(10)
-    .text('', 50)
-    .text(data.notes, 70, doc.y + 25)
+  // doc
+  //   .fontSize(10)
+  //   .text('', 50)
+  //   .text(data.notes, 70, doc.y + 25)
 
   doc
     .fontSize(10)
@@ -135,16 +148,108 @@ function createPDF (pdfPath, data) {
     .text('Alcantarilla (Murcia)', col2LeftPost, doc.y, { align: 'center' })
     .text('Tel: 968801332', col2LeftPost, doc.y, { align: 'center' })
 
-  // doc.addPage().fontSize(25).text('Tema legal', 100, 100)
+  doc.addPage().fontSize(12).text('CLÁUSULAS', 60, null)
+
+  doc.fontSize(10).font('Helvetica-Bold').text(
+    'Primera:\n', 60, null
+  ).font('Helvetica').text(
+    'El/los cliente/s, autoriza/n a Print Lab S.L a tomarle/s imágenes por cualquier medio técnico para\nla realización de la obra fotográfica y/o audiovisual objeto de este contrato.'
+  )
+
+  doc.font('Helvetica-Bold').text(
+    'Segunda:\n', 60, null
+  ).font('Helvetica').text(
+    'Según establece la ley de propiedad intelectual, todos los derechos y copyright de las obras fotográficas y/o audiovisuales objeto de este contrato, son propiedad de Print Lab y el uso de las mismas por parte de el/los cliente/s es privativo, no pudiendo este/os comercialiazrlas, reproducirlas o transformarlas por cualquier medio, cederlas a terceros, publicarlas, exhibirlas públicamente, etc... sin autorizazción expresa y fehaciente por escrito de Print Lab.'
+  )
+
+  doc.font('Helvetica-Bold').text(
+    'Tercera:\n', 60, null
+  ).font('Helvetica').text(
+    'El cliente autoriza a Print Lab al uso, exhibición de sus obras por cualquier medio de difusión (exhibición en tiendas, escaparates, internet, etc.). En caso contrario el cliente manifestará de su puño y letra que es contrario a esta cláusula junto a su firma.'
+  )
+
+  doc.font('Helvetica-Bold').text(
+    'Cuarta:\n', 60, null
+  ).font('Helvetica').text(
+    'Son propiedad de Print Lab todos los materiales necesarios para la realización de las obras fotográficas y/o audiovisuales.'
+  )
+
+  doc.font('Helvetica-Bold').text(
+    'Quinta:\n', 60, null
+  ).font('Helvetica').text(
+    'Cuando el desarrollo del trabajo contratado precise obtener permisos o autoriaziones de determinados lugares donde se tenga que realizar, asi como del audio, música o imágenes facilitadas por el cliente, corresponderá al/los cliente/s gestionar la obtención de la autoriación previa para su uso o utilización, así como del abono de las tasas o cánones si los hubiese.'
+  ).text(' ')
+
+  doc.fontSize(12).text('PLAZOS DE ENTREGA Y PENALIZACIONES')
+
+  doc.font('Helvetica-Bold').fontSize(10).text(
+    'Sexta:\n', 60, null
+  ).font('Helvetica').text(
+    'El plazo de entrega del trabajo realizazdo objeto de este contrato será de 6 meses, a contar desde la fecha de selección de las imágenes a incorporar al mismo por parte de el/los cliente/s.'
+  )
+
+  doc.font('Helvetica-Bold').text(
+    'Séptima:\n', 60, null
+  ).font('Helvetica').text(
+    'Print Lab, se obliga a la terminación del trabajo objeto de este contrato en el plazzo señalado de seis meses, a contar desde la fecha de selección de las imágenes a incorporar al mismo por parte de el/los cliente/s. En caso de que no se terminara en el plazo señalado, Print Lab indemnizará a el/los cliente/s con la cantidad de 3 € diarios en concepto de penalización.'
+  )
+
+  doc.font('Helvetica-Bold').text(
+    'Octava:\n', 60, null
+  ).font('Helvetica').text(
+    'Se entenderá por fecha de terminación del trabajo, el día en el que Print Lab lo comunique a el/los cliente/s por medio de CARTA, LLAMADA TELEFONICA, SMS, E-MAIL, etc...; esta comunicación quedará registrada en el archivo de Print Lab.'
+  )
+
+  doc.font('Helvetica-Bold').text(
+    'Novena:\n', 60, null
+  ).font('Helvetica').text(
+    'El/Los cliente/s dispondrá/n de 10 días a partir de la comunicación de que el trabajo está terminado, para la recogida del mismo y liquidación del importe pendiente si lo hubiese. En cualquier caso si la cancelación se produjera con 3 meses o menos de antelación, el/los cliente/s indemnizará/n a Print Lab con el 50% del presupuesto reflejado en este contrato.'
+  )
+
+  doc.font('Helvetica-Bold').text(
+    'Decimotercera:\n', 60, null
+  ).font('Helvetica').text(
+    'Si el trabajo objeto de este contrato, se suspendiera o retrasara por causa de fuerza mayor, se fijará una nueva fecha para la realización del mismo, fecha esta, que estará supeditada a que Print Lab pueda realizarlo. Si no fuese así, y el/los cliente/s no aceptara/n cambiarla, se aplicará la cláusula duodécima.'
+  )
+
+  doc.font('Helvetica-Bold').text(
+    'Decimocuarta:\n', 60, null
+  ).font('Helvetica').text(
+    'Para cualquier reclamación objeto de este contrato, que exceda la forma amistosa, ambas partes se someterán a los juzgados y Tribunales de la Región de Murcia'
+  ).text(' ').text(' ')
+
+  doc.fontSize(11).text('Por lo que de conformidad por ambas partes, lo firman por').text(' ')
+  doc.fontSize(10).text('Murcia, a')
 
   doc
+    .fontSize(10)
+    .text('El/los cliente/s', col1LeftPos, 730, { width: colWidth, align: 'center' })
+    .text(' ')
+    .text('Fdo.: ', col1LeftPos, doc.y, { width: colWidth, align: 'left' })
+    .text('Print Lab S.L', col2LeftPost, 730, { align: 'center' })
+    .text(' ')
+    .text('Fdo.: ', col2LeftPost, doc.y, { align: 'left' })
+
+  let currentDate = new Date().toLocaleDateString('es-ES')
+  currentDate = currentDate.split('/').join('-')
+  doc
     .pipe(
-      fs.createWriteStream(path.join(pdfPath, data.model.name + '.pdf'))
+      fs.createWriteStream(path.join(pdfPath, currentDate + '-' + data.general.model.name + '.pdf'))
     )
     .on('finish', () => {
     })
 
   doc.end()
 }
-
+// createPDF('C:\\Users\\dioxi\\Downloads', {
+//   general: {
+//     client: { name: 'Antonio', dni: '48636817M', phone: '968341502' },
+//     model: { name: 'Antonio' },
+//     pack: 'asd',
+//     notes: 'Paquete to flama que lo flipas de wapo\nameisin que lo matas',
+//     prize: '123'
+//   },
+//   event: undefined,
+//   studio: { date: '18-05-2021' }
+// })
 module.exports = { createPDF }

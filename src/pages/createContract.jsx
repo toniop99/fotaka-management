@@ -1,20 +1,18 @@
-import { Form, Input, Select, Button, DatePicker, notification } from 'antd'
+import { Form, Input, InputNumber, Select, Button, DatePicker, notification, Checkbox, Divider, Collapse } from 'antd'
 import locale from 'antd/es/date-picker/locale/es_ES'
 import { ipcRenderer } from 'electron'
 import { channels } from '../shared/constants'
 import moment from 'moment'
-import { useEffect, useState } from 'react'
+import usePackages from '../hooks/usePackages'
+import { useState } from 'react'
 
 const { TextArea } = Input
+const { Panel } = Collapse
 
 export default function CreateContract () {
-  const [packages, setPackages] = useState([])
-
-  useEffect(() => {
-    ipcRenderer.invoke(channels.GET_PACKAGES).then(({ packages }) => {
-      setPackages(packages)
-    })
-  }, [])
+  const { packages } = usePackages()
+  const [studio, setStudio] = useState(false)
+  const [event, setEvent] = useState(false)
 
   function selectOptions () {
     const options = []
@@ -30,15 +28,24 @@ export default function CreateContract () {
   }
 
   const manageForm = (formData) => {
-    const { client, event, model, notes, pack } = formData
+    const { general, event, studio } = formData
+    const data = { general }
 
-    event.date = event.date?.format('DD-MM-YYYY')
+    if (event) {
+      event.date = event.date?.format('DD-MM-YYYY')
+      data.event = event
+    }
 
-    ipcRenderer.invoke(channels.CREATE_CONTRACT_PDF, { client, event, model, notes, pack }).then(response => {
+    if (studio) {
+      studio.date = studio.date?.format('DD-MM-YYYY')
+      data.studio = studio
+    }
+
+    ipcRenderer.invoke(channels.CREATE_CONTRACT_PDF, { general, event, studio }).then(response => {
       if (response === true) {
         notification.open({
           message: 'Contrato creado',
-          description: `El contrato de ${client.name} ha sido creado.`,
+          description: `El contrato de ${general.client.name} ha sido creado.`,
           duration: 2
         })
       }
@@ -51,16 +58,38 @@ export default function CreateContract () {
     packages.forEach(p => {
       if (selectedPack === p.title) {
         form.setFieldsValue({
-          notes: `${p.title}:\n${p.content}\nPrecio: ${p.prize}`
+          general: {
+            notes: p.content,
+            prize: p.prize
+
+          }
         })
       }
     })
+  }
+
+  function manageContractType (checkedValues) {
+    if (checkedValues.find(el => el === 'studio')) {
+      setStudio(true)
+    } else {
+      setStudio(false)
+    }
+    if (checkedValues.find(el => el === 'event')) {
+      setEvent(true)
+    } else {
+      setEvent(false)
+    }
   }
 
   function disabledDate (current) {
     return current &&
         Boolean(current.isBefore(moment().subtract(1, 'days')))
   }
+
+  const contractOptions = [
+    { label: 'Estudio', value: 'studio' },
+    { label: 'Evento', value: 'event' }
+  ]
 
   return (
     <Form
@@ -71,49 +100,133 @@ export default function CreateContract () {
       onFinish={manageForm}
     >
 
-      <Form.Item name={['event', 'date']} label='Fecha del evento' labelCol>
-        <DatePicker locale={locale} format='DD-MM-YY' size='large' disabledDate={disabledDate} />
+      <Form.Item
+        name={['contract', 'type']}
+        label='Selecciona lo deseado'
+        labelCol
+        rules={[{ required: true, message: 'Selecciona al menos una opción' }]}
+      >
+        <Checkbox.Group options={contractOptions} onChange={manageContractType} />
       </Form.Item>
 
-      <Form.Item name={['event', 'place']} label='Lugar del evento' labelCol>
-        <Input />
-      </Form.Item>
+      <Collapse defaultActiveKey={['1']} accordion>
+        <Panel header='General' key='1'>
+          <Form.Item
+            name={['general', 'client', 'name']}
+            label='Nombre del cliente'
+            labelCol
+            rules={[{ required: true, message: 'Escribe el nombre del cliente' }]}
+          >
+            <Input />
+          </Form.Item>
 
-      <Form.Item name={['client', 'name']} label='Nombre del cliente' labelCol>
-        <Input />
-      </Form.Item>
+          <Form.Item
+            name={['general', 'client', 'dni']}
+            label='DNI del cliente'
+            labelCol
+            rules={[
+              { required: false, message: 'Escribe el nombre del cliente' },
+              { pattern: /^[0-9]{8}[TRWAGMYFPDXBNJZSQVHLCKE]|[XYZ][0-9]{7}[TRWAGMYFPDXBNJZSQVHLCKE]$/i, message: 'El DNI o NIE no tiene el formato adecuado' }]}
+          >
+            <Input />
+          </Form.Item>
 
-      <Form.Item name={['client', 'dni']} label='DNI del cliente' labelCol>
-        <Input />
-      </Form.Item>
+          <Form.Item
+            name={['general', 'client', 'phone']}
+            label='Teléfono del cliente'
+            labelCol
+            rules={[{ required: true, message: 'Escribe el número del cliente' }]}
+          >
+            <Input type='tel' />
+          </Form.Item>
 
-      <Form.Item name={['client', 'phone']} label='Teléfono del cliente' labelCol>
-        <Input type='tel' />
-      </Form.Item>
+          <Form.Item
+            name={['general', 'model', 'name']}
+            label='Nombre del modelo'
+            labelCol
+          >
+            <Input />
+          </Form.Item>
 
-      <Form.Item name={['client', 'direction']} label='Dirección' labelCol>
-        <Input />
-      </Form.Item>
+          <Form.Item
+            name={['general', 'pack']}
+            label='Paquete Seleccionado'
+            labelCol
+          >
+            <Select
+              placeholder='Selecciona el paquete contratado'
+              allowClear
+              options={selectOptions()}
+              onChange={manageSelectedPackage}
+            />
+          </Form.Item>
 
-      <Form.Item name={['model', 'name']} label='Nombre del modelo' labelCol>
-        <Input />
-      </Form.Item>
+          <Form.Item
+            name={['general', 'notes']}
+            label='Paquete Contratado'
+            labelCol
+            rules={[{ required: true, message: 'Escribe los datos del pack' }]}
+          >
+            <TextArea name='notes-text-area' allowClear autoSize={{ minRows: 5, maxRows: 12 }} placeholder='Escribe aquí la información extra que necesites' />
+          </Form.Item>
 
-      <Form.Item name='pack' label='Paquete Seleccionado' labelCol>
-        <Select
-          placeholder='Selecciona el paquete contratado'
-          allowClear
-          options={selectOptions()}
-          onChange={manageSelectedPackage}
-        />
+          <Form.Item
+            name={['general', 'prize']}
+            label='Precio'
+            labelCol
+            rules={[{ required: true, message: 'Escribe el precio del paquete' }]}
+          >
+            <InputNumber
+              name='pack-prize'
+              formatter={value => `$ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+              parser={value => value.replace(/\$\s?|(,*)/g, '')}
+            />
+          </Form.Item>
+        </Panel>
 
-      </Form.Item>
+        {
+      studio
+        ? <Panel header='Estudio' key='2'>
+          <Divider orientation='left'>Estudio</Divider>
+          <Form.Item
+            name={['studio', 'date']}
+            label='Fecha del estudio'
+            labelCol
+            rules={[{ required: true, message: 'Especifica la fecha del estudio' }]}
+          >
+            <DatePicker locale={locale} format='DD-MM-YY' size='large' disabledDate={disabledDate} />
+          </Form.Item>
+        </Panel>
+        : null
+      }
 
-      <Form.Item name='notes' label='Paquete Contratado y extras' labelCol>
-        <TextArea name='notes-text-area' allowClear autoSize={{ minRows: 5, maxRows: 12 }} placeholder='Escribe aquí la información extra que necesites' />
-      </Form.Item>
+        {
+      event
+        ? <Panel header='Evento' key='3'>
 
-      <Form.Item>
+          <Divider orientation='left'>Evento</Divider>
+          <Form.Item
+            name={['event', 'date']}
+            label='Fecha del evento'
+            labelCol
+            rules={[{ required: true, message: 'Especifica la fecha del evento' }]}
+          >
+            <DatePicker locale={locale} format='DD-MM-YY' size='large' disabledDate={disabledDate} />
+          </Form.Item>
+
+          <Form.Item name={['event', 'place']} label='Lugar del evento' labelCol>
+            <Input />
+          </Form.Item>
+
+          <Form.Item name={['event', 'direction']} label='Dirección' labelCol>
+            <Input />
+          </Form.Item>
+          </Panel>
+        : null
+      }
+      </Collapse>
+
+      <Form.Item style={{ marginTop: 25 }}>
         <Button type='primary' block htmlType='submit'>
           Crear Contrato
         </Button>

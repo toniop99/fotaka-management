@@ -1,4 +1,4 @@
-import { Form, Input, Button, notification } from 'antd'
+import { Form, Input, InputNumber, Button, notification } from 'antd'
 import { ipcRenderer } from 'electron'
 import { channels } from '../../shared/constants'
 
@@ -43,8 +43,17 @@ export default function CreatePackage () {
         <Input />
       </Form.Item>
 
-      <Form.Item name={['pack', 'prize']} label='Precio del paquete' labelCol>
-        <Input type='number' />
+      <Form.Item
+        name={['pack', 'prize']}
+        label='Precio del paquete'
+        labelCol
+        rules={[{ required: true, message: 'Escribe el precio del paquete' }]}
+      >
+        <InputNumber
+          name='pack-prize'
+          formatter={value => `$ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+          parser={value => value.replace(/\$\s?|(,*)/g, '')}
+        />
       </Form.Item>
 
       <Form.Item name={['pack', 'content']} label='Descripción del paquete' labelCol>

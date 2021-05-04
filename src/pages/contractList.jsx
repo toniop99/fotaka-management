@@ -1,7 +1,7 @@
 import { List, Button } from 'antd'
-import usePackages from '../../hooks/usePackages'
+import usePackages from '../hooks/usePackages'
 
-export default function ManagePackages () {
+export default function ContractList () {
   const { packages, deletePackage } = usePackages()
 
   function manageDeletePackage (item) {

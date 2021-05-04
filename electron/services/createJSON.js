@@ -6,9 +6,9 @@ function createJSON (savePath, data) {
   path.join(savePath, currentDate + '.json')
   const json = {
     date: currentDate,
-    client: data.client.name,
-    dni: data.client.dni,
-    phone: data.client.phone
+    client: data.general.client.name,
+    dni: data.general.client.dni,
+    phone: data.general.client.phone
   }
 
   const writeableJSON = JSON.stringify(json)

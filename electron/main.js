@@ -54,22 +54,23 @@ ipcMain.handle(channels.CREATE_CONTRACT_PDF, async (evt, data) => {
       if (response === 0) {
         const configPath = Config.store.get('configPath')
         const contractsPath = Config.store.get('contractsPath')
+        const currentContractPath = path.join(contractsPath, data.general.model.name)
         const jsonDatabasePath = Config.store.get('databasePath')
-
         createDir(configPath)
         createDir(contractsPath)
+        createDir(currentContractPath)
         createDir(jsonDatabasePath)
 
-        createPDF(contractsPath, data)
+        createPDF(currentContractPath, data)
         createJSON(jsonDatabasePath, data)
 
         const notification = new Notification({
           title: 'Contrato creado',
-          body: `El contrato ha sido creado y guardado en ${config.contractsPath}`
+          body: `El contrato ha sido creado y guardado en ${currentContractPath}`
         })
 
         notification.on('click', () => {
-          shell.openPath(contractsPath)
+          shell.openPath(currentContractPath)
         })
 
         notification.show()
