@@ -10,10 +10,10 @@ import {
 } from '@ant-design/icons'
 import { useState } from 'react'
 
-import Calendar from './components/Calendar'
+import Calendar from './pages/calendar'
 import CreateContract from './pages/createContract'
 import Settings from './pages/settings'
-import ContractList from './pages/contractList'
+import ContractsList from './pages/contractsList'
 
 import { HashRouter, Link, Redirect, Route, Switch } from 'react-router-dom'
 import { ipcRenderer } from 'electron'
@@ -38,7 +38,7 @@ function App () {
       <Button
         type='primary'
         size='small'
-        onClick={() => ipcRenderer.invoke(channels.RESTART_APP)}
+        onClick={() => ipcRenderer.invoke(channels.RESTART_APP_UPDATE)}
       >Reiniciar
       </Button>
     )
@@ -46,7 +46,8 @@ function App () {
     notification.open({
       message: 'Actualización descargada',
       description: 'La actualización se instalará al reiniciar el programa. ¿Reiniciar ahora?',
-      btn: restartBtn
+      btn: restartBtn,
+      duration: 0
     })
   })
 
@@ -106,7 +107,7 @@ function App () {
                 <Redirect to='create-contract' />
               </Route>
               <Route exact path='/create-contract' component={CreateContract} />
-              <Route exact path='/contracts-list' component={ContractList} />
+              <Route exact path='/contracts-list' component={ContractsList} />
               <Route exact path='/calendar' component={Calendar} />
               <Route exact path='/settings' component={Settings} />
             </Switch>

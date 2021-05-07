@@ -18,9 +18,12 @@ function config () {
     },
     databasePath: {
       type: 'string',
-      default: path.join(path.join(app.getPath('documents'), 'fotaka'), 'database')
+      default: path.join(path.join(app.getPath('documents'), 'fotaka'), 'data')
+    },
+    shopName: {
+      type: 'string',
+      default: 'Fotaka Estudio'
     }
-
   }
   const store = new Store({
     schema: defaultConfig,

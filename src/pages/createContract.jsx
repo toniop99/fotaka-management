@@ -1,4 +1,4 @@
-import { Form, Input, InputNumber, Select, Button, DatePicker, notification, Checkbox, Divider, Collapse } from 'antd'
+import { Form, Input, InputNumber, Select, Button, DatePicker, notification, Checkbox, Divider, Collapse, TimePicker } from 'antd'
 import locale from 'antd/es/date-picker/locale/es_ES'
 import { ipcRenderer } from 'electron'
 import { channels } from '../shared/constants'
@@ -29,24 +29,23 @@ export default function CreateContract () {
 
   const manageForm = (formData) => {
     const { general, event, studio } = formData
-    const data = { general }
 
     if (event) {
-      event.date = event.date?.format('DD-MM-YYYY')
-      data.event = event
+      event.date = event.date.format('DD-MM-YYYY')
+      event.time = event.time.format('HH:mm')
     }
 
     if (studio) {
-      studio.date = studio.date?.format('DD-MM-YYYY')
-      data.studio = studio
+      studio.date = studio.date.format('DD-MM-YYYY')
+      studio.time = studio.time.format('HH:mm')
     }
 
-    ipcRenderer.invoke(channels.CREATE_CONTRACT_PDF, { general, event, studio }).then(response => {
+    ipcRenderer.invoke(channels.CREATE_CONTRACT, { general, event, studio }).then(response => {
       if (response === true) {
         notification.open({
           message: 'Contrato creado',
           description: `El contrato de ${general.client.name} ha sido creado.`,
-          duration: 2
+          duration: 4
         })
       }
     })
@@ -196,6 +195,16 @@ export default function CreateContract () {
           >
             <DatePicker locale={locale} format='DD-MM-YY' size='large' disabledDate={disabledDate} />
           </Form.Item>
+
+          <Form.Item
+            name={['studio', 'time']}
+            label='Hora del estudio'
+            labelCol
+            rules={[{ required: true, message: 'Especifica la hora del estudio' }]}
+            initialValue={moment()}
+          >
+            <TimePicker format='HH:mm' minuteStep={5} />
+          </Form.Item>
         </Panel>
         : null
       }
@@ -212,6 +221,16 @@ export default function CreateContract () {
             rules={[{ required: true, message: 'Especifica la fecha del evento' }]}
           >
             <DatePicker locale={locale} format='DD-MM-YY' size='large' disabledDate={disabledDate} />
+          </Form.Item>
+
+          <Form.Item
+            name={['event', 'time']}
+            label='Hora del evento'
+            labelCol
+            rules={[{ required: true, message: 'Especifica la hora del evento' }]}
+            initialValue={moment()}
+          >
+            <TimePicker format='HH:mm' minuteStep={5} />
           </Form.Item>
 
           <Form.Item name={['event', 'place']} label='Lugar del evento' labelCol>

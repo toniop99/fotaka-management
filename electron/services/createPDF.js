@@ -3,6 +3,9 @@ const path = require('path')
 const PDFDocument = require('pdfkit')
 
 function createPDF (pdfPath, data) {
+  let currentDate = new Date().toLocaleDateString('es-ES')
+  currentDate = currentDate.split('/').join('-')
+
   const doc = new PDFDocument({
     size: 'A4'
   })
@@ -12,7 +15,6 @@ function createPDF (pdfPath, data) {
   const colWidth = 180
   const col2LeftPost = colWidth + col1LeftPos + 100
 
-  // Add watermark here
   doc.image(path.join(__dirname, '../img/watermark-fotaka.jpg'), 0, 0, { width: 595 })
 
   doc
@@ -21,6 +23,8 @@ function createPDF (pdfPath, data) {
     .text('PRINTLAB S.L CIB: B73722720', col2LeftPost, colTop)
     .text('C/Floridablanca 30 C.P 30167', col2LeftPost, null)
     .text('La Raya (Murcia)', col2LeftPost)
+    .font('Helvetica-Bold')
+    .text(`Fecha: ${currentDate}`, col2LeftPost)
 
   doc
     .fontSize(12)
@@ -32,44 +36,6 @@ function createPDF (pdfPath, data) {
     )
     .text(' ')
     .text(' ')
-
-  if (data.event) {
-    doc
-      .font('Helvetica-Bold')
-      .text('', 50)
-      .fontSize(12)
-      .text('Fecha del evento: ', { lineBreak: false })
-      .font('Helvetica')
-      .text(data.event.date)
-      .text(' ')
-
-    doc
-      .font('Helvetica-Bold')
-      .text('', 50)
-      .text('Lugar: ', { lineBreak: false })
-      .font('Helvetica')
-      .text(data.event.place)
-      .text(' ')
-
-    doc
-      .font('Helvetica-Bold')
-      .text('', 50)
-      .text('Dirección: ', { lineBreak: false })
-      .font('Helvetica')
-      .text(data.event.direction)
-      .text(' ')
-  }
-
-  if (data.studio) {
-    doc
-      .font('Helvetica-Bold')
-      .text('', 50)
-      .fontSize(12)
-      .text('Fecha del estudio: ', { lineBreak: false })
-      .font('Helvetica')
-      .text(data.studio.date)
-      .text(' ')
-  }
 
   doc
     .fontSize(11)
@@ -111,6 +77,51 @@ function createPDF (pdfPath, data) {
     .font('Helvetica')
     .text(data.general.pack)
     .text(' ')
+
+  if (data.event) {
+    doc
+      .font('Helvetica-Bold')
+      .text('', 50)
+      .fontSize(11)
+      .text('Fecha del evento: ', { lineBreak: false })
+      .font('Helvetica')
+      .text(data.event.date)
+      .font('Helvetica-Bold')
+      .moveUp(1)
+      .text('Hora del evento: ', 250, null, { lineBreak: false })
+      .font('Helvetica')
+      .text(data.event.time, 350, null)
+      .text(' ')
+
+    doc
+      .font('Helvetica-Bold')
+      .text('', 50)
+      .text('Lugar: ', { lineBreak: false })
+      .font('Helvetica')
+      .text(data.event.place)
+      .font('Helvetica-Bold')
+      .moveUp(1)
+      .text('Dirección: ', 250, null, { lineBreak: false })
+      .font('Helvetica')
+      .text(data.event.direction, 320)
+      .text(' ')
+  }
+
+  if (data.studio) {
+    doc
+      .font('Helvetica-Bold')
+      .text('', 50)
+      .fontSize(11)
+      .text('Fecha del estudio: ', { lineBreak: false })
+      .font('Helvetica')
+      .text(data.studio.date)
+      .font('Helvetica-Bold')
+      .moveUp(1)
+      .text('Hora del estudio: ', 250, null, { lineBreak: false })
+      .font('Helvetica')
+      .text(data.studio.time, 350)
+      .text(' ')
+  }
 
   doc.rect(50, doc.y + 25, 450, 150).stroke()
   doc
@@ -230,8 +241,6 @@ function createPDF (pdfPath, data) {
     .text(' ')
     .text('Fdo.: ', col2LeftPost, doc.y, { align: 'left' })
 
-  let currentDate = new Date().toLocaleDateString('es-ES')
-  currentDate = currentDate.split('/').join('-')
   doc
     .pipe(
       fs.createWriteStream(path.join(pdfPath, currentDate + '-' + data.general.model.name + '.pdf'))
@@ -249,7 +258,7 @@ function createPDF (pdfPath, data) {
 //     notes: 'Paquete to flama que lo flipas de wapo\nameisin que lo matas',
 //     prize: '123'
 //   },
-//   event: undefined,
-//   studio: { date: '18-05-2021' }
+//   event: { date: '25-05-2021', time: '18:00', place: 'La Raya', direction: 'Nuestra señora de la encarnación' },
+//   studio: { date: '18-05-2021', time: '22:15' }
 // })
 module.exports = { createPDF }

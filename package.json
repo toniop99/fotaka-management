@@ -1,7 +1,7 @@
 {
   "name": "fotaka-management",
   "main": "electron/main.js",
-  "version": "0.1.9",
+  "version": "0.2.2",
   "private": true,
   "homepage": "./",
   "author": {
@@ -31,6 +31,7 @@
   },
   "dependencies": {
     "@ant-design/icons": "^4.6.2",
+    "@googleapis/calendar": "^0.2.0",
     "@testing-library/jest-dom": "^5.11.10",
     "@testing-library/react": "^11.2.6",
     "@testing-library/user-event": "^12.8.3",
@@ -45,6 +46,7 @@
     "pdfkit": "^0.12.1",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
+    "react-highlight-words": "^0.17.0",
     "react-scripts": "4.0.3",
     "web-vitals": "^1.1.1"
   },

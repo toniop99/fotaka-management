@@ -12,14 +12,13 @@ function mainWindow () {
 
   function startWindow () {
     window = new BrowserWindow({
-      width: 800,
+      width: 900,
       height: 600,
-      minWidth: 800,
+      minWidth: 900,
       minHeight: 600,
       webPreferences: {
         nodeIntegration: true,
-        contextIsolation: false,
-        enableRemoteModule: true
+        contextIsolation: false
       }
     })
     window.loadURL(

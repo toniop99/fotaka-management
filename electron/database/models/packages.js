@@ -1,7 +1,6 @@
 const db = require('../db')
 
 async function createPackage (data) {
-  console.log(data)
   const createdPackage = await db.packages.insert(data)
   return createdPackage
 }

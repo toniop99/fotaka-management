@@ -7,9 +7,10 @@ export default function useContracts () {
 
   useEffect(() => {
     ipcRenderer.invoke(channels.GET_CONTRACTS).then(({ contracts }) => {
+      contracts.forEach((contract, index) => { contract.key = index + 1 })
       setContracts(contracts)
-    }, [contracts])
-  })
+    })
+  }, [])
 
   function createContract (contract) {
     ipcRenderer.invoke(channels.CREATE_CONTRACT, { id: contract._id }).then(({ contracts }) => {
@@ -18,8 +19,13 @@ export default function useContracts () {
   }
 
   function deleteContract (contract) {
-    ipcRenderer.invoke(channels.DELETE_CONTRACT, { id: contract._id }).then(({ contracts }) => {
-      setContracts(contracts)
+    ipcRenderer.invoke(channels.DELETE_CONTRACT, { id: contract._id }).then((response) => {
+      if (response) {
+        ipcRenderer.invoke(channels.GET_CONTRACTS).then(({ contracts }) => {
+          contracts.forEach((contract, index) => { contract.key = index + 1 })
+          setContracts(contracts)
+        })
+      }
     })
   }
 

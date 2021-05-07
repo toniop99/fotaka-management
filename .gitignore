@@ -13,6 +13,7 @@
 .env.test.local
 .env.production.local
 electron-builder.yml
+fotaka-management-312922-68164bc552ee.json
 
 npm-debug.log*
 yarn-debug.log*

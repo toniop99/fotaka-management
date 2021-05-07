@@ -1,12 +1,11 @@
 const Datastore = require('nedb-promises')
-const path = require('path')
 const { config } = require('../configuration/config')
 const { createDir } = require('../helpers/createDir')
 
 const Config = config()
 
 function dbFactory (fileName) {
-  const pathToCreate = path.join(Config.store.get('configPath'), 'data')
+  const pathToCreate = Config.store.get('databasePath')
   createDir(pathToCreate)
 
   return Datastore.create({
@@ -18,7 +17,8 @@ function dbFactory (fileName) {
 
 const db = {
   contracts: dbFactory('contracts.db'),
-  packages: dbFactory('packages.db')
+  packages: dbFactory('packages.db'),
+  calendarEvents: dbFactory('calendar.db')
 }
 
 module.exports = db
