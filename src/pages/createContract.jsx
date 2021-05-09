@@ -203,9 +203,9 @@ export default function CreateContract () {
             rules={[{ required: true, message: 'Especifica la hora del estudio' }]}
             initialValue={moment()}
           >
-            <TimePicker format='HH:mm' minuteStep={5} />
+            <TimePicker format='HH:mm' minuteStep={5} showNow={false} />
           </Form.Item>
-        </Panel>
+          </Panel>
         : null
       }
 
@@ -230,7 +230,7 @@ export default function CreateContract () {
             rules={[{ required: true, message: 'Especifica la hora del evento' }]}
             initialValue={moment()}
           >
-            <TimePicker format='HH:mm' minuteStep={5} />
+            <TimePicker format='HH:mm' minuteStep={5} showNow={false} />
           </Form.Item>
 
           <Form.Item name={['event', 'place']} label='Lugar del evento' labelCol>
@@ -240,7 +240,7 @@ export default function CreateContract () {
           <Form.Item name={['event', 'direction']} label='Dirección' labelCol>
             <Input />
           </Form.Item>
-          </Panel>
+        </Panel>
         : null
       }
       </Collapse>

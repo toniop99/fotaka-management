@@ -2,6 +2,8 @@ const path = require('path')
 const fs = require('fs')
 const moment = require('moment')
 
+require('dotenv').config()
+
 const { config } = require('./configuration/config')
 const Config = config()
 const { createDir } = require('./helpers/createDir')

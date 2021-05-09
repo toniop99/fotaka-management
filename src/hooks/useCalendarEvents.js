@@ -29,12 +29,13 @@ export default function useCalendarEvents ({ deps = [] }) {
   function getDayEvents (value) {
     const month = value.month()
     const day = value.date()
+    const year = value.year()
     const googleEvents = googleCalendarEvents.filter(ev => {
       const shop = ev.description.split('\n')[0]
 
       const evDate = moment(ev.start.datetime)
       if (shop !== shopName) {
-        if (evDate.month() === month && evDate.date() === day) return evDate
+        if (evDate.month() === month && evDate.date() === day && evDate.year() === year) return evDate
       }
 
       return null
